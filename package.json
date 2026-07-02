@@ -1,0 +1,12 @@
+{
+  "name": "leafscan",
+  "version": "1.0.0",
+  "description": "LeafScan - Plant Disease Detection Web App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

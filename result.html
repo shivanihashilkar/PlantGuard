@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantGuard - Disease Result</title>
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    body { background: var(--bg); }
+
+    .result-layout {
+      min-height: calc(100vh - 80px);
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+    }
+
+    .image-side {
+      background: #081d0d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 44px 62px;
+    }
+
+    .image-frame {
+      width: 100%;
+      max-width: 264px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #0b100a;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+    }
+
+    .image-frame img {
+      width: 100%;
+      min-height: 264px;
+      max-height: 360px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .content {
+      padding: 46px 44px 58px;
+      overflow: hidden;
+    }
+
+    .summary {
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .summary h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 46px;
+      line-height: 1.03;
+      margin: 14px 0 12px;
+      max-width: 800px;
+      overflow-wrap: anywhere;
+    }
+
+    .plant {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .cause {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .metric {
+      padding: 18px;
+      min-height: 92px;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .bar {
+      height: 8px;
+      margin-top: 11px;
+      background: rgba(127, 151, 118, 0.18);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--warn));
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .detail-card {
+      padding: 22px;
+      min-height: 280px;
+    }
+
+    .detail-card h2,
+    .matches h2 {
+      color: var(--green);
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .detail-card ul {
+      display: grid;
+      gap: 13px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .matches {
+      padding: 22px;
+    }
+
+    .prediction {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid rgba(127, 151, 118, 0.16);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .prediction:first-of-type {
+      border-top: 0;
+    }
+
+    .prediction strong {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .empty {
+      max-width: 520px;
+      margin: 80px auto;
+      padding: 34px;
+      text-align: center;
+    }
+
+    .empty h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .result-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .image-side {
+        padding: 28px 20px;
+      }
+
+      .content {
+        padding: 28px 20px 46px;
+      }
+
+      .metrics,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary h1 {
+        font-size: 38px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="app-logo" href="/upload">Plant<span>Guard</span></a>
+    <nav class="app-nav">
+      <a href="/upload">Dashboard</a>
+      <a class="active" href="/result">Results</a>
+    </nav>
+    <div class="avatar">PG</div>
+  </header>
+
+  <main id="resultRoot"></main>
+
+  <script>
+    const root = document.getElementById("resultRoot");
+    const result = JSON.parse(localStorage.getItem("leafscanResult") || "null");
+    const image = localStorage.getItem("leafscanImage") || "";
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function list(items) {
+      return (items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function cleanClassName(name) {
+      return String(name || "").replace("___", " - ").replaceAll("_", " ");
+    }
+
+    if (!result || !result.top) {
+      root.innerHTML = `
+        <div class="panel empty">
+          <h1>No result yet</h1>
+          <p class="muted" style="margin-bottom:22px;">Upload a supported plant leaf first.</p>
+          <a class="btn" href="/upload">Upload Image</a>
+        </div>
+      `;
+    } else {
+      const top = result.top;
+      const confidence = Math.max(0, Math.min(100, Number(top.confidence_pct || 0)));
+      const severity = Math.max(0, Math.min(100, Number(top.severity_pct || 0)));
+      const warning = confidence < 45
+        ? `<div class="alert warn" style="margin-bottom:18px;">Low match score. Try a clearer and closer leaf photo if this looks wrong.</div>`
+        : "";
+
+      root.innerHTML = `
+        <div class="result-layout">
+          <aside class="image-side">
+            <div class="image-frame">
+              ${image ? `<img src="${image}" alt="Uploaded plant leaf">` : `<div class="alert warn">No preview image saved.</div>`}
+            </div>
+          </aside>
+
+          <section class="content">
+            ${warning}
+            <div class="panel summary">
+              <div class="eyebrow">Disease Result</div>
+              <h1>${escapeHtml(top.display_name)}</h1>
+              <div class="plant">Plant: ${escapeHtml(top.plant)}</div>
+              <p class="cause">${escapeHtml(top.cause)}</p>
+
+              <div class="metrics">
+                <div class="panel metric">
+                  <small>Match Score</small>
+                  <strong>${confidence.toFixed(1)}%</strong>
+                  <div class="bar"><span style="width:${confidence}%"></span></div>
+                </div>
+                <div class="panel metric">
+                  <small>Severity</small>
+                  <strong>${escapeHtml(top.severity)}</strong>
+                  <div class="bar"><span style="width:${severity}%"></span></div>
+                </div>
+                <div class="panel metric">
+                  <small>Model</small>
+                  <strong>${escapeHtml(result.model || "PlantVillage classifier")}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <article class="panel detail-card">
+                <h2>Symptoms</h2>
+                <ul>${list(top.symptoms)}</ul>
+              </article>
+            </div>
+
+            <div class="panel matches">
+              <h2>Top Supported Matches</h2>
+              ${(result.predictions || []).map((pred) => `
+                <div class="prediction">
+                  <span>${escapeHtml(cleanClassName(pred.class))}</span>
+                  <strong>${Number(pred.confidence_pct || 0).toFixed(1)}%</strong>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

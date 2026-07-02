@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantGuard - Register</title>
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    .auth {
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+      padding: 32px 0;
+    }
+
+    .auth-card {
+      width: min(500px, 100%);
+      padding: 30px;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 44px;
+      margin: 12px 0 10px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .names {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(127, 151, 118, 0.28);
+      background: #0f160e;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 13px 14px;
+    }
+
+    .switch {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .switch a {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    @media (max-width: 560px) {
+      .names {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="app-logo" href="/login">Plant<span>Guard</span></a>
+    <nav class="app-nav">
+      <a href="/login">Login</a>
+      <a class="active" href="/register">Register</a>
+    </nav>
+  </header>
+
+  <main class="page auth">
+    <section class="panel auth-card">
+      <div class="eyebrow">Create Account</div>
+      <h1>Register</h1>
+      <p class="muted">Create an account to keep scan history.</p>
+      <form id="registerForm">
+        <div class="names">
+          <label>First name
+            <input id="firstName" required autocomplete="given-name">
+          </label>
+          <label>Last name
+            <input id="lastName" required autocomplete="family-name">
+          </label>
+        </div>
+        <label>Email
+          <input id="email" type="email" required autocomplete="email">
+        </label>
+        <label>Password
+          <input id="password" type="password" required autocomplete="new-password">
+        </label>
+        <label>Confirm password
+          <input id="confirmPassword" type="password" required autocomplete="new-password">
+        </label>
+        <button class="btn" type="submit">Create Account</button>
+        <div id="status" class="alert ok" style="display:none;"></div>
+      </form>
+      <p class="switch">Already have an account? <a href="/login">Login</a></p>
+    </section>
+  </main>
+
+  <script>
+    const API = "http://localhost:5000";
+    const form = document.getElementById("registerForm");
+    const statusBox = document.getElementById("status");
+
+    function setStatus(message, type) {
+      statusBox.style.display = "block";
+      statusBox.className = "alert " + type;
+      statusBox.textContent = message;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        setStatus("Password and confirm password do not match.", "error");
+        return;
+      }
+
+      setStatus("Creating account...", "warn");
+      try {
+        const response = await fetch(API + "/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            first_name: document.getElementById("firstName").value,
+            last_name: document.getElementById("lastName").value,
+            email: document.getElementById("email").value,
+            password
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Registration failed.");
+        localStorage.setItem("leafscanUser", JSON.stringify({
+          user_id: data.user_id,
+          first_name: document.getElementById("firstName").value,
+          last_name: document.getElementById("lastName").value,
+          email: document.getElementById("email").value
+        }));
+        window.location.href = "/upload";
+      } catch (error) {
+        setStatus(error.message, "error");
+      }
+    });
+  </script>
+</body>
+</html>

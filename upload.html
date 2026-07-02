@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantGuard - Upload</title>
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    body { background: var(--bg); }
+
+    .upload-main {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 62px;
+      padding: 44px 48px;
+    }
+
+    .upload-left {
+      width: 450px;
+      max-width: 100%;
+    }
+
+    .page-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow-line {
+      width: 32px;
+      height: 1px;
+      background: var(--green);
+    }
+
+    .eyebrow-text {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 50px;
+      line-height: 1.08;
+      margin-bottom: 18px;
+    }
+
+    .intro {
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 15px;
+      margin-bottom: 34px;
+    }
+
+    .tips {
+      display: grid;
+      gap: 13px;
+      margin-bottom: 26px;
+    }
+
+    .tip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tip-icon {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(121, 180, 109, 0.12);
+      color: var(--green);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .supported {
+      padding: 18px 20px;
+    }
+
+    .supported h2 {
+      color: var(--green);
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .supported p {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    .upload-right {
+      width: 420px;
+      max-width: 100%;
+      flex: 0 0 auto;
+    }
+
+    .drop-zone {
+      border: 1.5px dashed rgba(127, 151, 118, 0.38);
+      border-radius: 22px;
+      min-height: 326px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: rgba(32, 44, 29, 0.35);
+      cursor: pointer;
+      padding: 30px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drop-zone.drag {
+      border-color: var(--green);
+      background: rgba(121, 180, 109, 0.08);
+    }
+
+    .upload-icon {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: rgba(121, 180, 109, 0.12);
+      border: 1px solid rgba(121, 180, 109, 0.22);
+      margin-bottom: 20px;
+      font-size: 26px;
+    }
+
+    .drop-zone h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .formats {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0 16px;
+    }
+
+    .formats span {
+      border: 1px solid rgba(127, 151, 118, 0.28);
+      border-radius: 7px;
+      padding: 6px 12px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .preview img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+      background: #0b100a;
+    }
+
+    .analyze {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .camera-option,
+    .secure-note {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    .camera-icon,
+    .secure-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(121, 180, 109, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .camera-option h3 {
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .camera-option p,
+    .secure-note p {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    #status {
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .upload-main {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 28px 20px;
+        gap: 28px;
+      }
+
+      .upload-left,
+      .upload-right {
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="app-logo" href="/upload">Plant<span>Guard</span></a>
+    <nav class="app-nav">
+      <a class="active" href="/upload">Dashboard</a>
+      <a href="/result">Results</a>
+    </nav>
+    <div class="avatar">PG</div>
+  </header>
+
+  <main class="upload-main">
+    <section class="upload-left">
+      <div class="page-eyebrow">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">AI Diagnosis</span>
+      </div>
+      <h1>Scan Your<br>Plant Now</h1>
+      <p class="intro">Upload a clear photo of the affected leaf or plant. The model checks only supported PlantVillage plants and shows the closest disease match.</p>
+
+      <div class="tips">
+        <div class="tip"><div class="tip-icon">*</div><span>Photograph in good natural light for best accuracy</span></div>
+        <div class="tip"><div class="tip-icon">+</div><span>Focus on the most visibly affected area</span></div>
+        <div class="tip"><div class="tip-icon">L</div><span>Keep the leaf flat and fully in frame</span></div>
+        <div class="tip"><div class="tip-icon">I</div><span>Supported formats: JPG, PNG, WEBP</span></div>
+      </div>
+
+      <div class="panel supported">
+        <h2>Supported Plants</h2>
+        <p>Apple, Blueberry, Cherry, Corn, Grape, Orange, Peach, Bell Pepper, Potato, Raspberry, Soybean, Squash, Strawberry, Tomato.</p>
+        <p>Other plant types are rejected by this model.</p>
+      </div>
+    </section>
+
+    <section class="upload-right">
+      <div class="drop-zone" id="dropZone">
+        <div class="upload-icon">IMG</div>
+        <h2>Drop your image here</h2>
+        <p>Drag and drop your plant photo,<br>or click to browse your files</p>
+        <button class="btn" type="button" id="browseBtn">Browse Files</button>
+        <input id="fileInput" type="file" accept="image/*" hidden>
+      </div>
+
+      <div class="panel preview" id="preview">
+        <img id="previewImg" alt="Selected plant preview">
+      </div>
+
+      <div class="formats">
+        <span>JPG</span><span>PNG</span><span>WEBP</span><span>Max 20MB</span>
+      </div>
+
+      <button class="btn analyze" id="analyzeBtn" type="button" disabled>Analyze Plant</button>
+      <div id="status" class="alert ok">Backend ready. Upload a supported plant leaf.</div>
+
+      <div class="panel camera-option" id="cameraOption">
+        <div class="camera-icon">CAM</div>
+        <div>
+          <h3>Use Camera</h3>
+          <p>Take a photo directly with your device</p>
+        </div>
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+      </div>
+
+      <div class="panel secure-note">
+        <div class="secure-icon">LOCK</div>
+        <p>Your images are processed locally by the LeafScan backend and are not shared with third parties.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API = "http://localhost:5000";
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    const cameraInput = document.getElementById("cameraInput");
+    const cameraOption = document.getElementById("cameraOption");
+    const browseBtn = document.getElementById("browseBtn");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const preview = document.getElementById("preview");
+    const previewImg = document.getElementById("previewImg");
+    const statusBox = document.getElementById("status");
+    let selectedFile = null;
+    let selectedDataUrl = "";
+
+    function setStatus(message, type) {
+      statusBox.className = "alert " + type;
+      statusBox.textContent = message;
+    }
+
+    function selectFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        setStatus("Please choose an image file.", "error");
+        return;
+      }
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        selectedDataUrl = reader.result;
+        previewImg.src = selectedDataUrl;
+        preview.style.display = "block";
+        analyzeBtn.disabled = false;
+        setStatus("Image selected. Ready to analyze.", "ok");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    browseBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      fileInput.click();
+    });
+    dropZone.addEventListener("click", () => fileInput.click());
+    cameraOption.addEventListener("click", () => cameraInput.click());
+    fileInput.addEventListener("change", () => selectFile(fileInput.files[0]));
+    cameraInput.addEventListener("change", () => selectFile(cameraInput.files[0]));
+
+    dropZone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropZone.classList.add("drag");
+    });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag"));
+    dropZone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dropZone.classList.remove("drag");
+      selectFile(event.dataTransfer.files[0]);
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+      analyzeBtn.disabled = true;
+      setStatus("Analyzing plant image...", "warn");
+
+      const form = new FormData();
+      form.append("image", selectedFile);
+      const user = JSON.parse(localStorage.getItem("leafscanUser") || "null");
+      if (user && user.user_id) form.append("user_id", user.user_id);
+
+      try {
+        const response = await fetch(API + "/analyze", { method: "POST", body: form });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Analysis failed.");
+        localStorage.setItem("leafscanResult", JSON.stringify(data));
+        localStorage.setItem("leafscanImage", selectedDataUrl);
+        window.location.href = "/result";
+      } catch (error) {
+        setStatus(error.message, "error");
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
