@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeafScan — Upload Image</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+  body {
+    background: var(--charcoal);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+
+  .upload-main {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px; gap: 64px;
+  }
+
+  .upload-left { flex: 1; max-width: 480px; }
+
+  .page-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .eyebrow-line { width: 32px; height: 2px; background: var(--moss); }
+  .eyebrow-text { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--moss); }
+
+  .upload-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px; font-weight: 900;
+    color: var(--cream); line-height: 1.1;
+    letter-spacing: -1.5px; margin-bottom: 16px;
+  }
+  .upload-left p { font-size: 15px; color: rgba(245,240,232,0.45); line-height: 1.7; margin-bottom: 36px; }
+
+  .upload-tips { display: flex; flex-direction: column; gap: 12px; }
+  .tip { display: flex; align-items: center; gap: 12px; font-size: 13px; color: rgba(245,240,232,0.5); }
+  .tip-icon {
+    width: 32px; height: 32px;
+    background: rgba(74,124,89,0.15);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+
+  .upload-right { width: 420px; flex-shrink: 0; }
+
+  .upload-zone {
+    border: 2px dashed rgba(143,175,126,0.3);
+    border-radius: 24px; padding: 56px 40px;
+    text-align: center; background: rgba(74,124,89,0.04);
+    cursor: pointer; transition: all 0.3s;
+    position: relative; overflow: hidden; margin-bottom: 20px;
+  }
+  .upload-zone:hover {
+    border-color: var(--moss); background: rgba(74,124,89,0.08);
+    transform: translateY(-2px);
+  }
+  .upload-zone::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(74,124,89,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .upload-zone.drag-over { border-color: var(--moss); background: rgba(74,124,89,0.12); }
+
+  .upload-icon-wrap {
+    width: 72px; height: 72px;
+    background: rgba(74,124,89,0.12);
+    border: 1px solid rgba(74,124,89,0.25);
+    border-radius: 20px; display: flex;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 28px;
+  }
+  .upload-zone h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--cream); margin-bottom: 8px;
+  }
+  .upload-zone p { font-size: 13px; color: rgba(245,240,232,0.4); margin-bottom: 24px; line-height: 1.5; }
+
+  .upload-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--sage); border: none; border-radius: 10px;
+    padding: 12px 24px; color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .upload-btn:hover { background: var(--sage-dark); }
+
+  .format-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .tag {
+    background: rgba(143,175,126,0.1);
+    border: 1px solid rgba(143,175,126,0.2);
+    border-radius: 6px; padding: 5px 12px;
+    font-size: 11px; font-weight: 600; color: var(--moss); letter-spacing: 1px;
+  }
+
+  .camera-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px;
+    border: 1px solid rgba(143,175,126,0.15);
+    border-radius: 14px; background: rgba(255,255,255,0.02);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .camera-option:hover { border-color: rgba(143,175,126,0.35); background: rgba(255,255,255,0.04); }
+  .camera-icon {
+    width: 44px; height: 44px; background: rgba(74,124,89,0.12);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .camera-text h4 { font-size: 14px; font-weight: 600; color: var(--cream); margin-bottom: 2px; }
+  .camera-text p { font-size: 12px; color: rgba(245,240,232,0.4); }
+
+  /* Preview */
+  .preview-wrap { display: none; margin-bottom: 20px; text-align: center; }
+  .preview-wrap img { max-width: 100%; max-height: 200px; border-radius: 14px; border: 1px solid rgba(143,175,126,0.3); }
+  .preview-wrap.show { display: block; }
+
+  .analyze-btn {
+    display: none; width: 100%; margin-top: 12px;
+    background: var(--sage); border: none; border-radius: 10px;
+    padding: 15px; color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .analyze-btn.show { display: block; }
+  .analyze-btn:hover { background: var(--sage-dark); }
+
+  @media (max-width: 900px) {
+    .upload-main { flex-direction: column; padding: 24px; }
+    .upload-left, .upload-right { width: 100%; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <a class="app-logo" href="/upload">Leaf<span>Scan</span></a>
+  <nav class="app-nav">
+    <a class="active" href="/upload">Dashboard</a>
+    <a href="/result">Results</a>
+  </nav>
+  <div class="avatar">AG</div>
+</header>
+
+<div class="upload-main">
+  <div class="upload-left">
+    <div class="page-eyebrow">
+      <div class="eyebrow-line"></div>
+      <span class="eyebrow-text">AI Diagnosis</span>
+    </div>
+    <h2>Scan Your<br>Plant Now</h2>
+    <p>Upload a clear photo of the affected leaf or plant. Our AI will analyze it in seconds and identify any diseases or health issues.</p>
+    <div class="upload-tips">
+      <div class="tip"><div class="tip-icon">☀️</div><span>Photograph in good natural light for best accuracy</span></div>
+      <div class="tip"><div class="tip-icon">🔍</div><span>Focus on the most visibly affected area</span></div>
+      <div class="tip"><div class="tip-icon">📐</div><span>Keep the leaf flat and fully in frame</span></div>
+      <div class="tip"><div class="tip-icon">🖼️</div><span>Supported formats: JPG, PNG, HEIC, WEBP</span></div>
+    </div>
+  </div>
+
+  <div class="upload-right">
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon-wrap">📸</div>
+      <h3>Drop your image here</h3>
+      <p>Drag and drop your plant photo,<br>or click to browse your files</p>
+      <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+        <span>↑</span> Browse Files
+      </button>
+      <div class="scan-overlay">
+        <div class="scan-line"></div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewImage(this)">
+
+    <div class="preview-wrap" id="previewWrap">
+      <img id="previewImg" src="" alt="Preview">
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="window.location='/result'">
+      🔬 Analyze Plant →
+    </button>
+
+    <div class="format-tags" style="margin-bottom:16px;">
+      <span class="tag">JPG</span><span class="tag">PNG</span>
+      <span class="tag">HEIC</span><span class="tag">WEBP</span>
+      <span class="tag">Max 20MB</span>
+    </div>
+
+    <div class="camera-option" onclick="document.getElementById('cameraInput').click()">
+      <div class="camera-icon">📷</div>
+      <div class="camera-text">
+        <h4>Use Camera</h4>
+        <p>Take a photo directly with your device</p>
+      </div>
+      <svg style="margin-left:auto;opacity:0.3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="previewImage(this)">
+
+    <div style="margin-top:16px;padding:16px 20px;background:rgba(74,124,89,0.08);border:1px solid rgba(74,124,89,0.2);border-radius:12px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:18px;">🔒</span>
+      <p style="font-size:12px;color:rgba(245,240,232,0.4);line-height:1.5;">Your images are encrypted and processed securely. They are never shared with third parties.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const zone = document.getElementById('dropZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) showPreview(file);
+  });
+
+  function previewImage(input) {
+    if (input.files && input.files[0]) showPreview(input.files[0]);
+  }
+
+  function showPreview(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('previewImg').src = e.target.result;
+      document.getElementById('previewWrap').classList.add('show');
+      document.getElementById('analyzeBtn').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+</body>
+</html>
