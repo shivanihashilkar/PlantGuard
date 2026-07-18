@@ -1,0 +1,9 @@
+[LeafScan] MySQL connected and leafscan schema is ready
+[LeafScan] Starting prototype classifier
+[LeafScan] Loaded prototype cache: C:\Users\Snehal hashilkar\Downloads\leafscan-project - Copy\ml_server\saved_model\prototype_cache.npz
+[LeafScan] Model ready with 38 supported classes
+
+LeafScan ML Server starting on http://localhost:5000
+
+ * Serving Flask app 'app'
+ * Debug mode: off
